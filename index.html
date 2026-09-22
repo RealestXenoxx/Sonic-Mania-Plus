@@ -300,7 +300,7 @@
     <script type="text/javascript">
         const BACKGROUNDS = [
             "https://images.weserv.nl/?url=images.launchbox-app.com/da83d6c4-4a5d-4151-a0df-1f20a8f7c743.jpg",
-            "https://images.weserv.nl/?url=images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/9452f3ff-b1eb-4aea-9fcd-4792e57a3d19/dc7b3xu-0aeaf5a4-fb95-43da-95c7-86a51d2755d7.png",
+            "https://i.ytimg.com/vi/C1HmUohjUsg/maxresdefault.jpg",
             "https://images.weserv.nl/?url=wallpaperaccess.com/full/3539588.jpg"
         ];
 
@@ -437,5 +437,31 @@
     </script>
     <script src="https://cdn.jsdelivr.net/gh/UGBONTOP/Sonic-Mania-InYourBrowser@main/Data.js"></script>
     <script async type="text/javascript" src="https://cdn.jsdelivr.net/gh/UGBONTOP/Sonic-Mania-InYourBrowser@refs/heads/main/RSDKv5U.js"></script>
+
+    <script>
+        (function() {
+            var DESIRED_TITLE = "Sonic Mania Plus";
+            var titleEl = document.querySelector('title');
+
+            if (titleEl && titleEl.textContent !== DESIRED_TITLE) {
+                titleEl.textContent = DESIRED_TITLE;
+            }
+
+            var observer = new MutationObserver(function() {
+                if (document.title !== DESIRED_TITLE) {
+                    document.title = DESIRED_TITLE;
+                }
+            });
+
+            observer.observe(titleEl, { childList: true, characterData: true, subtree: true });
+
+            var headObserver = new MutationObserver(function() {
+                if (document.title !== DESIRED_TITLE) {
+                    document.title = DESIRED_TITLE;
+                }
+            });
+            headObserver.observe(document.head, { childList: true, subtree: true });
+        })();
+    </script>
 </body>
 </html>
