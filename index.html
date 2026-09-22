@@ -1,27 +1,16 @@
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-L7856P3VNT"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-L7856P3VNT');
-</script>
-<!doctype html>
-<!-- Credit to Crunchtop for the port-->
-<!-- Note to web developers looking to add this to their website. This game can bug out and crash sometimes. Refresh the page if a crash is experienced -->
+<!DOCTYPE html>
 <html lang="en-us">
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <title>Sonic Mania</title>
+    <title>Sonic Mania Plus</title>
 
-    <!-- ✅ Chrome app / tab icon -->
-    <link rel="icon" type="image/png"
-          href="https://cdn2.steamgriddb.com/icon/cc46f33ee83eb94cea644695f8717c0e/32/256x256.png">
+    <link rel="icon" type="image/jpeg"
+          href="https://pbs.twimg.com/media/F0Yu5yzXsAArA6m.jpg">
 
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
@@ -44,42 +33,71 @@
             visibility: hidden;
         }
 
-        canvas.visible {
-            visibility: visible;
-        }
+        canvas.visible { visibility: visible; }
 
         #output { display: none; }
 
+        /* ---------- LOADING SCREEN ---------- */
         #loading-screen {
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            /* ✅ New loading background image */
-            background: url('https://i.ytimg.com/vi/C1HmUohjUsg/maxresdefault.jpg') no-repeat center center;
-            background-size: cover;
+            inset: 0;
+            background: #000;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-end;
+            padding-bottom: 48px;
             z-index: 1000;
-            transition: opacity 0.1s ease;
+            overflow: hidden;
+            transition: opacity 0.45s ease;
         }
 
-        #loading-screen.fade-out {
-            opacity: 0;
+        .bg-layer {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: blur(10px) brightness(0.7);
+            transform: scale(1.08);
+        }
+
+        .center-logo {
+            position: absolute;
+            top: 32%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 3;
+            width: min(460px, 70vw);
+            height: auto;
             pointer-events: none;
+            user-select: none;
+            filter:
+                drop-shadow(0 8px 24px rgba(0, 0, 0, 0.75))
+                drop-shadow(0 0 2px rgba(0, 0, 0, 0.9));
         }
 
-        #loading-screen.hidden {
-            display: none;
-        }
+        #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+        #loading-screen.hidden { display: none; }
 
         .loading-content {
-            width: 80%;
-            max-width: 600px;
+            position: relative;
+            z-index: 2;
+            width: 90%;
+            max-width: 560px;
+            padding: 28px 30px 24px;
             display: flex;
             flex-direction: column;
-            align-items: flex-start;
+            gap: 16px;
+            background: rgba(16, 18, 26, 0.65);
+            border: 1px solid rgba(255, 255, 255, 0.10);
+            border-radius: 24px;
+            backdrop-filter: blur(20px) saturate(160%);
+            -webkit-backdrop-filter: blur(20px) saturate(160%);
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.70),
+                0 0 0 1px rgba(255, 255, 255, 0.03) inset,
+                0 2px 0 rgba(255, 255, 255, 0.05) inset;
         }
 
         .loading-header {
@@ -87,224 +105,247 @@
             justify-content: space-between;
             align-items: center;
             width: 100%;
-            margin-bottom: 8px;
+            gap: 12px;
         }
 
-        .title-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
+        .title-group { display: flex; align-items: center; gap: 12px; min-width: 0; }
 
         .mini-favicon {
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+            flex-shrink: 0;
+            object-fit: cover;
         }
 
         .loading-title {
-            color: #ffffff;
-            font-size: 16px;
-            font-weight: 900;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .loading-mb {
-            color: #ffffff;
-            font-size: 14px;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            color: rgba(255,255,255,0.85);
+            font-size: 12.5px;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
+            background: rgba(255,255,255,0.06);
+            padding: 4px 12px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.08);
         }
 
         .loading-bar-container {
+            position: relative;
             width: 100%;
             height: 10px;
-            background: rgba(255,255,255,0.2);
-            border-radius: 10px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 999px;
             overflow: hidden;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
         }
 
         .loading-bar {
+            position: relative;
             width: 0%;
             height: 100%;
-            background: #ffffff;
-            border-radius: 10px;
-            transition: width 0.3s ease-out;
+            border-radius: 999px;
+            background: linear-gradient(90deg, #4facfe 0%, #00f2fe 50%, #4facfe 100%);
+            background-size: 200% 100%;
+            animation: bar-shift 2.5s linear infinite;
+            transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+            box-shadow: 0 0 16px rgba(0,242,254,0.5), 0 0 32px rgba(79,172,254,0.25);
+        }
+
+        .loading-bar::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.7) 50%, transparent 100%);
+            background-size: 40% 100%;
+            background-repeat: no-repeat;
+            animation: shimmer 1.8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        .loading-bar::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            right: 0;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+            background: #fff;
+            box-shadow: 0 0 10px #fff, 0 0 24px #00f2fe;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .loading-bar.active::before { opacity: 1; }
+
+        @keyframes bar-shift {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 200% 0%; }
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -50% 0; }
+            100% { background-position: 150% 0; }
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 2px;
         }
 
         .loading-text {
             font-size: 13px;
-            color: #ffffff;
-            font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            color: rgba(255,255,255,0.9);
+            font-weight: 500;
+            letter-spacing: 0.2px;
+            text-shadow: 0 2px 6px rgba(0,0,0,0.9);
             height: 1.2em;
         }
 
+        .loading-percent {
+            font-size: 14px;
+            font-weight: 800;
+            color: #9ae6ff;
+            font-variant-numeric: tabular-nums;
+            text-shadow: 0 0 12px rgba(0,242,254,0.5), 0 2px 6px rgba(0,0,0,0.9);
+            background: rgba(0, 242, 254, 0.10);
+            padding: 4px 12px;
+            border-radius: 40px;
+            border: 1px solid rgba(0, 242, 254, 0.25);
+            line-height: 1;
+        }
+
         .loading-dots {
-            position: absolute;
-            bottom: 40%;
             display: flex;
             gap: 8px;
+            justify-content: center;
+            margin-top: 2px;
         }
 
         .dot {
-            width: 8px;
-            height: 8px;
-            background: #ffffff;
+            width: 5px;
+            height: 5px;
+            background: rgba(255,255,255,0.9);
             border-radius: 50%;
-            animation: dot-pulse 1.5s infinite ease-in-out;
-            box-shadow: 0 0 5px rgba(255,255,255,0.5);
+            animation: dot-pulse 1.4s infinite ease-in-out;
+            box-shadow: 0 0 8px rgba(0,242,254,0.6), 0 0 2px rgba(0,0,0,0.9);
         }
 
-        .dot:nth-child(2) { animation-delay: 0.2s; }
-        .dot:nth-child(3) { animation-delay: 0.4s; }
+        .dot:nth-child(2) { animation-delay: 0.18s; }
+        .dot:nth-child(3) { animation-delay: 0.36s; }
 
         @keyframes dot-pulse {
-            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            0%, 100% { opacity: 0.25; transform: scale(0.75); }
             50% { opacity: 1; transform: scale(1.2); }
-        }
-
-        .ownership-footer {
-            position: absolute;
-            bottom: 25px;
-            width: 100%;
-            text-align: center;
-            color: rgba(255,255,255,0.7);
-            font-size: 11px;
-            padding: 0 20px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-
-        .control-panel {
-            position: fixed;
-            top: 15px;
-            right: 15px;
-            z-index: 1001;
-        }
-
-        .game-btn {
-            background: rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 6px;
-            color: white;
-            padding: 8px 12px;
-            font-size: 12px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            backdrop-filter: blur(4px);
-            transition: all 0.2s;
-            min-width: 130px;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .game-btn:hover {
-            background: rgba(0,0,0,0.8);
-            border-color: rgba(255,255,255,0.4);
         }
     </style>
 </head>
 <body>
 
-    <!-- Canvas always present and running, just invisible until fade done -->
     <canvas id="canvas" width="424" height="240" onclick="window.focus();" oncontextmenu="event.preventDefault();"></canvas>
     <textarea id="output" rows="8"></textarea>
 
-    <div class="control-panel">
-        <button id="fullscreen-button" class="game-btn">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            Fullscreen
-        </button>
-    </div>
-
     <div id="loading-screen">
+        <div class="bg-layer" id="bg"></div>
+
+        <img class="center-logo"
+             src="https://cdn2.steamgriddb.com/logo_thumb/59353e05a88e9b4e71bc0b989a81d75a.png"
+             alt="Sonic Mania Plus">
+
         <div class="loading-content">
             <div class="loading-header">
                 <div class="title-group">
-                    <!-- ✅ Mini icon swapped to new image -->
-                    <img src="https://cdn2.steamgriddb.com/icon/cc46f33ee83eb94cea644695f8717c0e/32/256x256.png" class="mini-favicon" alt="icon">
-                    <div class="loading-title">Sonic Mania ported to the web by Crunch Arcade</div>
+                    <img src="https://pbs.twimg.com/media/F0Yu5yzXsAArA6m.jpg" class="mini-favicon" alt="icon">
+                    <div class="loading-title">Sonic Mania Plus</div>
                 </div>
-                <div class="loading-mb" id="mb-text">0.0MB of 198.8MB</div>
+                <div class="loading-mb" id="mb-text">0.0 / 198.8 MB</div>
             </div>
+
             <div class="loading-bar-container">
                 <div class="loading-bar" id="loading-bar"></div>
             </div>
-            <div class="loading-text" id="loading-text">getting jsdlivr stuff</div>
-        </div>
 
-        <div class="loading-dots">
-            <div class="dot"></div>
-            <div class="dot"></div>
-            <div class="dot"></div>
-        </div>
+            <div class="status-row">
+                <div class="loading-text" id="loading-text">Initializing…</div>
+                <div class="loading-percent" id="loading-percent">0%</div>
+            </div>
 
-        <div class="ownership-footer">
-            crunch arcade owns this btw
+            <div class="loading-dots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
         </div>
     </div>
 
     <script type="text/javascript">
+        const BACKGROUNDS = [
+            "https://images.launchbox-app.com/da83d6c4-4a5d-4151-a0df-1f20a8f7c743.jpg",
+            "https://images-wixmp-ed30a86b8c4ca887773594c2.wixmp.com/f/9452f3ff-b1eb-4aea-9fcd-4792e57a3d19/dc7b3xu-0aeaf5a4-fb95-43da-95c7-86a51d2755d7.png?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1cm46YXBwOjdlMGQxODg5ODIyNjQzNzNhNWYwZDQxNWVhMGQyNmUwIiwiaXNzIjoidXJuOmFwcDo3ZTBkMTg4OTgyMjY0MzczYTVmMGQ0MTVlYTBkMjZlMCIsIm9iaiI6W1t7InBhdGgiOiIvZi85NDUyZjNmZi1iMWViLTRhZWEtOWZjZC00NzkyZTU3YTNkMTkvZGM3YjN4dS0wYWVhZjVhNC1mYjk1LTQzZGEtOTVjNy04NmE1MWQyNzU1ZDcucG5nIn1dXSwiYXVkIjpbInVybjpzZXJ2aWNlLmZpbGUuZG93bmxvYWQiXX0.8igFgMKwd2ahXH8N4PLVA1VnHqZnRLKthxK_9A3LIoI",
+            "https://wallpaperaccess.com/full/3539588.jpg"
+        ];
+
+        function pickBackground() {
+            const last = sessionStorage.getItem('lastBg');
+            let index;
+            do {
+                index = Math.floor(Math.random() * BACKGROUNDS.length);
+            } while (BACKGROUNDS.length > 1 && String(index) === last);
+            sessionStorage.setItem('lastBg', String(index));
+            return BACKGROUNDS[index];
+        }
+
+        document.getElementById('bg').style.backgroundImage =
+            'url("' + pickBackground() + '")';
+
         var loadingBar = document.getElementById('loading-bar');
         var loadingText = document.getElementById('loading-text');
+        var loadingPercent = document.getElementById('loading-percent');
         var mbText = document.getElementById('mb-text');
         var loadingScreen = document.getElementById('loading-screen');
-        var fullscreenButton = document.getElementById('fullscreen-button');
         var canvas = document.getElementById('canvas');
         var totalSizeMB = 198.8;
 
-        var links = [
-            "crunch arcade on top",
-        ];
-
-        function speakCrunch() {
-            window.speechSynthesis.cancel();
-            var utterance = new SpeechSynthesisUtterance("Crunch arcade on top");
-            utterance.rate = 1.6;
-            utterance.pitch = 1.0;
-            window.speechSynthesis.speak(utterance);
-        }
-
-        window.onclick = function() {
-            var probe = new SpeechSynthesisUtterance("");
-            window.speechSynthesis.speak(probe);
-        };
-
-        function typeWriter(text, i, callback) {
-            if (i === 0) speakCrunch();
-            if (i < text.length) {
-                loadingText.textContent = text.substring(0, i + 1);
-                setTimeout(function() { typeWriter(text, i + 1, callback); }, 40);
-            } else if (callback) {
-                setTimeout(callback, 3000);
-            }
+        function setProgress(percent) {
+            percent = Math.max(0, Math.min(100, percent));
+            loadingBar.style.width = percent + '%';
+            loadingPercent.textContent = Math.round(percent) + '%';
+            var currentMB = (percent / 100 * totalSizeMB).toFixed(1);
+            mbText.textContent = currentMB + ' / ' + totalSizeMB.toFixed(1) + ' MB';
+            if (percent > 0 && percent < 100) loadingBar.classList.add('active');
+            else if (percent >= 100) loadingBar.classList.remove('active');
         }
 
         function finishLoading() {
-            loadingBar.style.width = '100%';
-            mbText.textContent = totalSizeMB.toFixed(1) + 'MB of ' + totalSizeMB.toFixed(1) + 'MB';
-            var randomLink = links[Math.floor(Math.random() * links.length)];
-            typeWriter(randomLink, 0, function() {
+            setProgress(100);
+            loadingText.textContent = 'Ready!';
+            setTimeout(function() {
                 loadingScreen.classList.add('fade-out');
                 loadingScreen.addEventListener('transitionend', function() {
                     loadingScreen.classList.add('hidden');
                     canvas.classList.add('visible');
                 }, { once: true });
-            });
+            }, 700);
         }
-
-        fullscreenButton.onclick = function() {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(function() {
-                    console.warn("Fullscreen failed");
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        };
 
         var Module = {
             preRun: [function() {
@@ -325,7 +366,6 @@
             }],
             postRun: [function() {
                 finishLoading();
-
                 setInterval(function() {
                     try {
                         var data = FS.readFile('/SaveData.bin');
@@ -339,12 +379,12 @@
             print: function(text) { console.log(text); },
             printErr: function(text) { console.error(text); },
             canvas: (function() {
-                var canvas = document.getElementById('canvas');
-                canvas.addEventListener("webglcontextlost", function(e) {
+                var c = document.getElementById('canvas');
+                c.addEventListener("webglcontextlost", function(e) {
                     alert('WebGL context lost. Reload the page.');
                     e.preventDefault();
                 }, false);
-                return canvas;
+                return c;
             })(),
             setStatus: function(text) {
                 if (!Module.setStatus.last) Module.setStatus.last = {time: Date.now(), text: ''};
@@ -360,35 +400,28 @@
                 if (m) {
                     var loaded = parseFloat(m[2]);
                     var total = parseFloat(m[4]);
-                    var percent = Math.round((loaded / total) * 100);
-                    var currentMB = (percent / 100 * totalSizeMB).toFixed(1);
-
-                    loadingBar.style.width = percent + '%';
-                    mbText.textContent = currentMB + 'MB of ' + totalSizeMB.toFixed(1) + 'MB';
-
-                    if (percent < 20) loadingText.textContent = "getting jsdlivr stuff";
-                    else if (percent < 60) loadingText.textContent = "downloading game data...";
-                    else if (percent < 90) loadingText.textContent = "assembling Data.rsdk...";
-                    else loadingText.textContent = "almost there...";
-
+                    var percent = (loaded / total) * 100;
+                    setProgress(percent);
+                    if (percent < 20) loadingText.textContent = "Loading engine…";
+                    else if (percent < 60) loadingText.textContent = "Downloading game data…";
+                    else if (percent < 90) loadingText.textContent = "Assembling Data.rsdk…";
+                    else loadingText.textContent = "Almost there…";
                 } else if (text.startsWith('Downloading part')) {
                     var match = text.match(/(\d+)\/(\d+)/);
                     if (match) {
-                        var p = Math.round((parseInt(match[1]) / parseInt(match[2])) * 60);
-                        loadingBar.style.width = p + '%';
-                        var currentMB = (p / 100 * totalSizeMB).toFixed(1);
-                        mbText.textContent = currentMB + 'MB of ' + totalSizeMB.toFixed(1) + 'MB';
-                        loadingText.textContent = text;
+                        var p = (parseInt(match[1]) / parseInt(match[2])) * 60;
+                        setProgress(p);
+                        loadingText.textContent = "Downloading game data…";
                     }
                 } else if (text === 'Assembling Data.data...') {
-                    loadingBar.style.width = '65%';
-                    loadingText.textContent = "combining stuff";
+                    setProgress(65);
+                    loadingText.textContent = "Combining files…";
                 }
             },
             totalDependencies: 0,
             monitorRunDependencies: function(left) {
                 this.totalDependencies = Math.max(this.totalDependencies, left);
-                Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : '');
+                Module.setStatus(left ? 'Preparing… (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : '');
             }
         };
 
